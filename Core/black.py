@@ -17,7 +17,7 @@ file_name = None
 root.geometry('800x700+300+50')
 root.iconphoto(False,PhotoImage(file='./Scr/blacknotepad-logo.png'))
 def new_file(event=None):
-    root.title("Untitled")
+    root.title("Black-Notepad Untitled")
     global file_name
     file_name = None
     content_text.delete(1.0, END)
