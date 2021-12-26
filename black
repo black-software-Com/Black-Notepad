@@ -111,13 +111,13 @@ file_name = None
 root.geometry('800x700+300+50')
 photo = PhotoImage(file='./Scr/black-notepad-logo.png')
 root.iconphoto(True,photo)
+
 def new_file(event=None):
     root.title("Black-Notepad Untitled")
     global file_name
     file_name = None
-
-    notebook.add(tab1,text="Untitled")
-    content_text.delete(1.0,END)
+    content_text.delete(1.0, END)
+    on_content_changed()
 
 def open_file(event=None):
     input_file_name = tkinter.filedialog.askopenfilename(defaultextension=".txt",filetypes=[("All Files", "*.*"), ("Text Documents", "*.txt"),("HTML", "*.html"),("CSS", "*.css"),("JavaScript", "*.js")])
@@ -136,6 +136,7 @@ def write_to_file(file_name):
         content = content_text.get(1.0, 'end')
         with open(file_name, 'w') as the_file:
             the_file.write(content)
+            the_file.close()
     except IOError:
         pass  
 def save_as(event=None):
@@ -201,6 +202,82 @@ def find_text(event=None):
         search_toplevel.destroy()
     search_toplevel.protocol('WM_DELETE_WINDOW', close_search_window)
     return "break"
+def get_line_numbers():
+    output = ''
+    if show_line_number.get():
+        row, col = content_text.index("end").split('.')
+        for i in range(1, int(row)):
+            output += str(i) + '\n'
+    return output
+def on_content_changed(event=None):
+    update_line_numbers()
+    update_cursor()
+def update_line_numbers(event=None):
+    line_numbers = get_line_numbers()
+    line_number_bar.config(state='normal')
+    line_number_bar.delete('1.0', 'end')
+    line_number_bar.insert('1.0', line_numbers)
+    line_number_bar.config(state='disabled')
+
+def show_cursor():
+    show_cursor_info_checked = show_cursor_info.get()
+    if show_cursor_info_checked:
+        cursor_info_bar.pack(expand='no', fill=None, side='right', anchor='se')
+    else:
+        cursor_info_bar.pack_forget()
+def update_cursor(event=None):
+    row, col = content_text.index(INSERT).split('.')
+    line_num, col_num = str(int(row)), str(int(col) + 1)  
+    infotext = "Line: {0} | Column: {1}".format(line_num, col_num)
+    cursor_info_bar.config(text=infotext)
+
+def highlight_line(interval=100):
+    content_text.tag_remove("active_line", 1.0, "end")
+    content_text.tag_add(
+        "active_line", "insert linestart", "insert lineend+1c")
+    content_text.after(interval, toggle_highlight)
+def get_line_numbers():
+    output = ''
+    if show_line_number.get():
+        row, col = content_text.index("end").split('.')
+        for i in range(1, int(row)):
+            output += str(i) + '\n'
+    return output
+def on_content_changed(event=None):
+    update_line_numbers()
+    update_cursor()
+def update_line_numbers(event=None):
+    line_numbers = get_line_numbers()
+    line_number_bar.config(state='normal')
+    line_number_bar.delete('1.0', 'end')
+    line_number_bar.insert('1.0', line_numbers)
+    line_number_bar.config(state='disabled')
+
+def show_cursor():
+    show_cursor_info_checked = show_cursor_info.get()
+    if show_cursor_info_checked:
+        cursor_info_bar.pack(expand='no', fill=None, side='right', anchor='se')
+    else:
+        cursor_info_bar.pack_forget()
+def update_cursor(event=None):
+    row, col = content_text.index(INSERT).split('.')
+    line_num, col_num = str(int(row)), str(int(col) + 1)  
+    infotext = "Line: {0} | Column: {1}".format(line_num, col_num)
+    cursor_info_bar.config(text=infotext)
+
+def highlight_line(interval=100):
+    content_text.tag_remove("active_line", 1.0, "end")
+    content_text.tag_add(
+        "active_line", "insert linestart", "insert lineend+1c")
+    content_text.after(interval, toggle_highlight)
+def undo_highlight():
+    content_text.tag_remove("active_line", 1.0, "end")
+def toggle_highlight(event=None):
+    if to_highlight_line.get():
+        highlight_line()
+    else:
+        undo_highlight()
+
 def search_output(needle,if_ignore_case, content_text, search_toplevel, search_box):
     content_text.tag_remove('match','1.0', END)
     matches_found=0
@@ -244,13 +321,7 @@ def exit_editor(event=None):
     else:
         root.destroy()
 
-def get_line_numbers():
-    output = ''
-    if show_line_number.get():
-        row, col = content_text.index("end").split('.')
-        for i in range(1, int(row)):
-            output += str(i) + '\n'
-    return output
+
 def on_content_changed(event=None):
     update_line_numbers()
     update_cursor()
@@ -300,8 +371,7 @@ def new_window(event=None):
     getoutput("python black.py")
 def print_paper(event=None):
     try:
-        # content_text
-        getoutput(f"")
+        getoutput(f"print {file_name} /c /d:lpt1")
     except (Exception,):
         print(False)
 def delete(event=None):
@@ -508,6 +578,7 @@ font_size.add_command(label="Set Size",command=set_size)
 view_menu.add_cascade(label="Font Style",menu=font_style)
 view_menu.add_cascade(label="Font Size",menu=font_size)
 menu_bar.add_cascade(label='View', menu=view_menu)
+
 def help(event=None):
     open_new_tab('https://black-software-com.github.io/Black-Help/')
 def feedback(event=None):
@@ -539,10 +610,13 @@ if file_cha_ == 0 or file_cha_ == 1 or file_cha_ == 2 or file_cha_ == 3:
 
     notebook.add(tab1,text='UnTitled')
     notebook.add(tab2,text="Read.txt")
-    l = Label(tab2,text="Black-Notepad",font=("None",40))
-    l.place(bordermode=INSIDE,x=230,y=15)
-    l_txt = Label(tab2,text="Black-Webbrowser v2.0 Coming Soon...")
-    l_txt.place(x=300,y=90)
+    l = Label(tab2,text="Black-Notepad (Beta)",font=("None",25))
+    l.place(bordermode=INSIDE,x=240,y=15)
+
+
+    l_txt = Label(tab2,text="Black-Notepad v2.0 Coming Soon...",font=("None",15))
+    l_txt.place(x=235,y=130)
+
     g = HTMLLabel(tab2,html='<a href="https://github.com/black-software-com" target="_blank"> Github </a>')
     g.place(bordermode=INSIDE,x=20,y=230)
     f = HTMLLabel(tab2,html='<a href="https://www.facebook.com/profile.php?id=100071465381949" target="_blank"> Facebook </a>')
@@ -615,33 +689,35 @@ popup_menu.add_command(label="Reload",accelerator='Ctrl+R',underline=6,command=r
 popup_menu.add_command(label="Delete",accelerator='Delete',underline=7,command=delete)
 popup_menu.add_separator()
 popup_menu.add_command(label='Select All', accelerator='Ctrl+A',underline=8, command=selectall)
-content_text.bind('<Button-3>', show_popup_menu)
-content_text.bind('<Control-N>', new_file)
-content_text.bind('<Control-n>', new_file)
-content_text.bind('<Control-O>', open_file)
-content_text.bind('<Control-o>', open_file)
-content_text.bind('<Control-S>', save)
-content_text.bind('<Control-s>', save)
-content_text.bind('<Control-Y>',redo)
-content_text.bind('<Control-y>',redo)
-content_text.bind('<Control-A>',selectall)
-content_text.bind('<Control-a>',selectall)
-content_text.bind('<Control-F>',find_text)
-content_text.bind('<Control-f>',find_text)
-content_text.bind("<Control-r>",reload)
-content_text.bind("<Control-R>",reload)
-content_text.bind("<Control-h>",help)
-content_text.bind("<Control-H>",help)
-content_text.bind("<Control-f>",feedback)
-content_text.bind("<Control-F>",feedback)
-content_text.bind("<Control-l>",license)
-content_text.bind("<Control-L>",license)
-content_text.bind("<Delete>",delete)
-content_text.bind('<Any-KeyPress>', on_content_changed)
+root.bind('<Button-3>', show_popup_menu)
+root.bind('<Control-N>', new_file)
+root.bind('<Control-n>', new_file)
+root.bind('<Control-O>', open_file)
+root.bind('<Control-o>', open_file)
+root.bind('<Control-S>', save)
+root.bind('<Control-s>', save)
+root.bind('<Control-Y>',redo)
+root.bind('<Control-y>',redo)
+root.bind('<Control-A>',selectall)
+root.bind('<Control-a>',selectall)
+root.bind('<Control-F>',find_text)
+root.bind('<Control-f>',find_text)
+root.bind("<Control-r>",reload)
+root.bind("<Control-R>",reload)
+root.bind("<Control-h>",help)
+root.bind("<Control-H>",help)
+root.bind("<Control-f>",feedback)
+root.bind("<Control-F>",feedback)
+root.bind("<Control-l>",license)
+root.bind("<Control-L>",license)
+root.bind("<Delete>",delete)
+root.bind('<Any-KeyPress>', on_content_changed)
 content_text.tag_configure('active_line', background='ivory2')
-content_text.bind('<Button-3>', show_popup_menu)
-content_text.focus_set()
+root.bind('<Button-3>', show_popup_menu)
+root.focus_set()
 root.protocol('WM_DELETE_WINDOW', exit_editor)
+
+global black_version,black_help
 black_version = "Black-Notepad v1.0"
 black_help = """
                 --- [ Black-Notepad ]---
