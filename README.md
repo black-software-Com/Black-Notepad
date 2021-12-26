@@ -1,6 +1,6 @@
 # Black-Notepad v1.0
 <p>
-<img  title="Black-Notepad Scr" src="./Core/Scr/blacknotepad-scr.png" alt="Black-Notepad Scr">
+<img  title="Black-Notepad Scr" src="./Scr/Black-Notepad-Scr.jpeg" alt="Black-Notepad Screen">
 </p>
 <hr>
 
