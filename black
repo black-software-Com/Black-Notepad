@@ -8,7 +8,7 @@ import os,sys
 from webbrowser import open_new_tab
 from subprocess import getoutput
 import tkinter.filedialog
-import tkinter.messagebox
+import tkinter.messagebox 
 from tkhtmlview import HTMLLabel
 
 class CustomNotebook(Notebook):
@@ -117,6 +117,7 @@ def new_file(event=None):
     file_name = None
 
     notebook.add(tab1,text="Untitled")
+    content_text.delete(1.0,END)
 
 def open_file(event=None):
     input_file_name = tkinter.filedialog.askopenfilename(defaultextension=".txt",filetypes=[("All Files", "*.*"), ("Text Documents", "*.txt"),("HTML", "*.html"),("CSS", "*.css"),("JavaScript", "*.js")])
@@ -144,8 +145,7 @@ def save_as(event=None):
         file_name = input_file_name
         write_to_file(file_name)
         root.title('{} - {}'.format(os.path.basename(file_name), title_))
-        ttuple[1] = os.path.basename(file_name)
-        notebook.add(ttuple)
+        notebook.add(tab1,os.path.basename(file_name))
     return "break"
     
 def save(event=None):
@@ -642,4 +642,46 @@ content_text.tag_configure('active_line', background='ivory2')
 content_text.bind('<Button-3>', show_popup_menu)
 content_text.focus_set()
 root.protocol('WM_DELETE_WINDOW', exit_editor)
-root.mainloop()
+black_version = "Black-Notepad v1.0"
+black_help = """
+                --- [ Black-Notepad ]---
+                
+                Argument:
+                         --start | start
+                         black <FileName|FileAddress>
+                         -v | --version
+                         -h | --help
+
+"""
+try:
+    if sys.argv[1] == '--start' or sys.argv[1] == 'start' or sys.argv[1].lower() == 'start' or sys.argv[1].lower() == '--start':
+        root.mainloop()
+    elif sys.argv[1] == '--version' or sys.argv[1] == '--v' or sys.argv[1].lower() == '--v' or sys.argv[1] == '-v' or sys.argv[1].lower() == '-v': # Code
+        print(f'\n{black_version}\n')
+        quit()
+    elif sys.argv[1] == '--help' or sys.argv[1].lower() == '--help' or sys.argv[1].lower() == '--h' or sys.argv[1].lower() == '--h' or sys.argv[1] == '-h' or sys.argv[1].lower() == '-h':
+        print(black_help)
+        quit()
+    elif sys.argv[1] == sys.argv[1]:
+        try:
+            file = open(sys.argv[1],"r").readline()
+            file_ = open(sys.argv[1],"r")
+            file_.readlines()
+            file_.close()
+            file_name = file_.name
+            for i in file:
+                content_text.insert(END,i)
+                notebook.add(tab1,text=os.path.basename(file_.name)) 
+            root.mainloop()
+        except (Exception,FileNotFoundError,NameError,):
+            tkinter.messagebox.showinfo(title="Cannot Running",message=f"File: {sys.argv[1]}")
+            print(f"\nFile: {sys.argv[1]} Not Found!\n")
+            quit()
+    else:
+        print(f"\n{sys.argv[1]} Not Found!\n")
+        print("Usage: black --help")
+        quit()
+
+except (IndexError):
+    print("\nUsage: black --help\n")
+    quit()
