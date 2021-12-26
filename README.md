@@ -36,6 +36,6 @@ cd Black-Notepad/Core
 python black.py
 ```
 
-#### [License](https://github.com/black-software-Com/Black-Notepad/blob/main/LICENSE)
+#### [License](https://github.com/black-software-Com/Black-Notepad/blob/main/LICENSE) 📝
 <br>
 
