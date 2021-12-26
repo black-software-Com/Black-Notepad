@@ -36,6 +36,15 @@ cd Black-Notepad/Core
 python black.py
 ```
 
+### Black-Notepad Argument:
+``` txt
+Argument:
+          black --start
+          black <FileName or FilePath>
+          -v | --verion
+          -h | --help
+```
+
 #### [License](https://github.com/black-software-Com/Black-Notepad/blob/main/LICENSE) 📝
 <br>
 
